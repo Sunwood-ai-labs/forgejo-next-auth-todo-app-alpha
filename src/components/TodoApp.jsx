@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Modal from './Modal';
 import { useAuth } from '../contexts/AuthContext';
 import TodoApiClient from '../lib/apiClient';
@@ -42,6 +42,9 @@ export default function TodoApp() {
     
     // Stats state
     const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, completionRate: 0 });
+    
+    // デバウンス用のタイマー参照
+    const statsLoadTimerRef = useRef(null);
 
     // Load todos from API on initial render
     const loadTodos = useCallback(async () => {
@@ -59,16 +62,24 @@ export default function TodoApp() {
         }
     }, [auth.user, filterStatus, filterPriority, apiClient]);
     
-    // Load stats from API
+    // Load stats from API (デバウンス付き)
     const loadStats = useCallback(async () => {
         if (!auth.user) return;
         
-        try {
-            const statsData = await apiClient.getTodoStats();
-            setStats(statsData);
-        } catch (error) {
-            console.error("Error loading stats:", error);
+        // 既存のタイマーをクリア
+        if (statsLoadTimerRef.current) {
+            clearTimeout(statsLoadTimerRef.current);
         }
+        
+        // 500ms後に実行（デバウンス）
+        statsLoadTimerRef.current = setTimeout(async () => {
+            try {
+                const statsData = await apiClient.getTodoStats();
+                setStats(statsData);
+            } catch (error) {
+                console.error("Error loading stats:", error);
+            }
+        }, 500);
     }, [auth.user, apiClient]);
 
     useEffect(() => {
@@ -76,12 +87,14 @@ export default function TodoApp() {
         loadStats();
     }, [loadTodos, loadStats]);
 
-    // Reload stats when todos change
+    // クリーンアップ関数でタイマーをクリア
     useEffect(() => {
-        if (todos.length >= 0) {
-            loadStats();
-        }
-    }, [todos, loadStats]);
+        return () => {
+            if (statsLoadTimerRef.current) {
+                clearTimeout(statsLoadTimerRef.current);
+            }
+        };
+    }, []);
 
     // Show toast message
     const showToast = (message, type = 'info') => {
@@ -112,8 +125,9 @@ export default function TodoApp() {
             setTodoPriority('medium');
             showToast('TODOを追加しました', 'success');
             
-            // Reload todos
+            // Reload todos and stats
             await loadTodos();
+            loadStats(); // デバウンス付きで実行
         } catch (error) {
             console.error('Error adding todo:', error);
             showToast('TODOの追加に失敗しました', 'error');
@@ -131,8 +145,9 @@ export default function TodoApp() {
             await apiClient.updateTodo(id, { completed: !todo.completed });
             showToast(todo.completed ? `「${todo.title}」を未完了に戻しました` : `「${todo.title}」を完了しました`, 'success');
             
-            // Reload todos
+            // Reload todos and stats
             await loadTodos();
+            loadStats(); // デバウンス付きで実行
         } catch (error) {
             console.error('Error toggling todo:', error);
             showToast('TODOの更新に失敗しました', 'error');
@@ -152,8 +167,9 @@ export default function TodoApp() {
             await apiClient.deleteTodo(id);
             showToast(`「${escapeHtml(todoToDelete.title)}」を削除しました`, 'success');
             
-            // Reload todos
+            // Reload todos and stats
             await loadTodos();
+            loadStats(); // デバウンス付きで実行
         } catch (error) {
             console.error('Error deleting todo:', error);
             showToast('TODOの削除に失敗しました', 'error');
@@ -190,8 +206,9 @@ export default function TodoApp() {
             setEditingTodo(null);
             showToast('TODOを更新しました', 'success');
             
-            // Reload todos
+            // Reload todos and stats
             await loadTodos();
+            loadStats(); // デバウンス付きで実行
         } catch (error) {
             console.error('Error updating todo:', error);
             showToast('TODOの更新に失敗しました', 'error');
