@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+forgejo-next-todo/.SourceSageAssets/
+forgejo-next-todo/issue_creator.log
