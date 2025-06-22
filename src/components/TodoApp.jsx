@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Modal from './Modal'; // Modalコンポーネントをインポート
-
-const LOCAL_STORAGE_KEY = 'forgejo_next_todos';
+import Modal from './Modal';
+import { useAuth } from '../contexts/AuthContext';
+import TodoApiClient from '../lib/apiClient';
 
 // Helper function for HTML escaping (simplified)
 const escapeHtml = (unsafe) => {
@@ -17,17 +17,21 @@ const escapeHtml = (unsafe) => {
 };
 
 export default function TodoApp() {
+    const auth = useAuth();
+    const [apiClient] = useState(() => new TodoApiClient(auth));
+    
     const [todos, setTodos] = useState([]);
     const [todoTitle, setTodoTitle] = useState('');
     const [todoDescription, setTodoDescription] = useState('');
     const [todoPriority, setTodoPriority] = useState('medium');
+    const [loading, setLoading] = useState(false);
 
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterPriority, setFilterPriority] = useState('all');
 
     // Modal state
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [editingTodo, setEditingTodo] = useState(null); // Store the todo being edited
+    const [editingTodo, setEditingTodo] = useState(null);
     // Edit form states
     const [editTitle, setEditTitle] = useState('');
     const [editDescription, setEditDescription] = useState('');
@@ -35,28 +39,49 @@ export default function TodoApp() {
 
     // Toast state
     const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+    
+    // Stats state
+    const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, completionRate: 0 });
 
-    // Load todos from localStorage on initial render
-    useEffect(() => {
+    // Load todos from API on initial render
+    const loadTodos = useCallback(async () => {
+        if (!auth.user) return;
+        
         try {
-            const storedTodos = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (storedTodos) {
-                setTodos(JSON.parse(storedTodos));
-            }
+            setLoading(true);
+            const todosData = await apiClient.getTodos({ status: filterStatus, priority: filterPriority });
+            setTodos(todosData);
         } catch (error) {
-            console.error("Error loading todos from localStorage:", error);
-            setTodos([]); // Fallback to empty array on error
+            console.error("Error loading todos:", error);
+            showToast('TODOの読み込みに失敗しました', 'error');
+        } finally {
+            setLoading(false);
         }
-    }, []);
+    }, [auth.user, filterStatus, filterPriority, apiClient]);
+    
+    // Load stats from API
+    const loadStats = useCallback(async () => {
+        if (!auth.user) return;
+        
+        try {
+            const statsData = await apiClient.getTodoStats();
+            setStats(statsData);
+        } catch (error) {
+            console.error("Error loading stats:", error);
+        }
+    }, [auth.user, apiClient]);
 
-    // Save todos to localStorage whenever todos state changes
     useEffect(() => {
-        try {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(todos));
-        } catch (error) {
-            console.error("Error saving todos to localStorage:", error);
+        loadTodos();
+        loadStats();
+    }, [loadTodos, loadStats]);
+
+    // Reload stats when todos change
+    useEffect(() => {
+        if (todos.length >= 0) {
+            loadStats();
         }
-    }, [todos]);
+    }, [todos, loadStats]);
 
     // Show toast message
     const showToast = (message, type = 'info') => {
@@ -66,53 +91,74 @@ export default function TodoApp() {
         }, 3000);
     };
 
-    const generateId = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
-
-    const handleAddTodo = (e) => {
+    const handleAddTodo = async (e) => {
         e.preventDefault();
         if (!todoTitle.trim()) {
             showToast('TODOのタイトルを入力してください', 'error');
             return;
         }
-        const newTodo = {
-            id: generateId(),
-            title: todoTitle.trim(),
-            description: todoDescription.trim(),
-            priority: todoPriority,
-            completed: false,
-            createdAt: new Date().toISOString(),
-            completedAt: null,
-            updatedAt: new Date().toISOString(),
-        };
-        setTodos(prevTodos => [newTodo, ...prevTodos]);
-        setTodoTitle('');
-        setTodoDescription('');
-        setTodoPriority('medium');
-        showToast('TODOを追加しました', 'success');
-    };
-
-    const toggleTodoComplete = (id) => {
-        let todoTitleForMessage = "";
-        setTodos(prevTodos =>
-            prevTodos.map(todo => {
-                if (todo.id === id) {
-                    todoTitleForMessage = todo.title;
-                    return { ...todo, completed: !todo.completed, completedAt: !todo.completed ? new Date().toISOString() : null, updatedAt: new Date().toISOString() };
-                }
-                return todo;
-            })
-        );
-        const todo = todos.find(t => t.id === id);
-        if (todo) { // Check if todo exists before accessing its properties
-             showToast(todo.completed ? `「${todoTitleForMessage}」を未完了に戻しました` : `「${todoTitleForMessage}」を完了しました`, 'success');
+        
+        try {
+            setLoading(true);
+            const todoData = {
+                title: todoTitle.trim(),
+                description: todoDescription.trim(),
+                priority: todoPriority
+            };
+            
+            await apiClient.createTodo(todoData);
+            setTodoTitle('');
+            setTodoDescription('');
+            setTodoPriority('medium');
+            showToast('TODOを追加しました', 'success');
+            
+            // Reload todos
+            await loadTodos();
+        } catch (error) {
+            console.error('Error adding todo:', error);
+            showToast('TODOの追加に失敗しました', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const deleteTodo = (id) => {
+    const toggleTodoComplete = async (id) => {
+        const todo = todos.find(t => t.id === id);
+        if (!todo) return;
+        
+        try {
+            setLoading(true);
+            await apiClient.updateTodo(id, { completed: !todo.completed });
+            showToast(todo.completed ? `「${todo.title}」を未完了に戻しました` : `「${todo.title}」を完了しました`, 'success');
+            
+            // Reload todos
+            await loadTodos();
+        } catch (error) {
+            console.error('Error toggling todo:', error);
+            showToast('TODOの更新に失敗しました', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const deleteTodo = async (id) => {
         const todoToDelete = todos.find(todo => todo.id === id);
-        if (todoToDelete && confirm(`「${escapeHtml(todoToDelete.title)}」を削除しますか？`)) {
-            setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
+        if (!todoToDelete || !confirm(`「${escapeHtml(todoToDelete.title)}」を削除しますか？`)) {
+            return;
+        }
+        
+        try {
+            setLoading(true);
+            await apiClient.deleteTodo(id);
             showToast(`「${escapeHtml(todoToDelete.title)}」を削除しました`, 'success');
+            
+            // Reload todos
+            await loadTodos();
+        } catch (error) {
+            console.error('Error deleting todo:', error);
+            showToast('TODOの削除に失敗しました', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -124,42 +170,41 @@ export default function TodoApp() {
         setIsEditModalOpen(true);
     };
 
-    const handleUpdateTodo = (e) => {
+    const handleUpdateTodo = async (e) => {
         e.preventDefault();
         if (!editingTodo || !editTitle.trim()) {
             showToast('タイトルは必須です', 'error');
             return;
         }
-        setTodos(prevTodos =>
-            prevTodos.map(todo =>
-                todo.id === editingTodo.id
-                    ? {
-                        ...todo,
-                        title: editTitle.trim(),
-                        description: editDescription.trim(),
-                        priority: editPriority,
-                        updatedAt: new Date().toISOString(),
-                      }
-                    : todo
-            )
-        );
-        setIsEditModalOpen(false);
-        setEditingTodo(null);
-        showToast('TODOを更新しました', 'success');
+        
+        try {
+            setLoading(true);
+            const updates = {
+                title: editTitle.trim(),
+                description: editDescription.trim(),
+                priority: editPriority
+            };
+            
+            await apiClient.updateTodo(editingTodo.id, updates);
+            setIsEditModalOpen(false);
+            setEditingTodo(null);
+            showToast('TODOを更新しました', 'success');
+            
+            // Reload todos
+            await loadTodos();
+        } catch (error) {
+            console.error('Error updating todo:', error);
+            showToast('TODOの更新に失敗しました', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const filteredTodos = todos.filter(todo => {
-        const statusMatch = filterStatus === 'all' ||
-            (filterStatus === 'completed' && todo.completed) ||
-            (filterStatus === 'pending' && !todo.completed);
-        const priorityMatch = filterPriority === 'all' || todo.priority === filterPriority;
-        return statusMatch && priorityMatch;
-    });
-
-    const totalTodos = todos.length;
-    const completedTodosCount = todos.filter(todo => todo.completed).length;
-    const pendingTodosCount = totalTodos - completedTodosCount;
-    const completionRate = totalTodos > 0 ? Math.round((completedTodosCount / totalTodos) * 100) : 0;
+    // Filter todos on client side (API already filters, but keeping for UI responsiveness)
+    const filteredTodos = todos;
+    
+    // Use stats from API instead of calculating locally
+    const { total: totalTodos, completed: completedTodosCount, pending: pendingTodosCount, completionRate } = stats;
 
     const priorityText = { low: '低', medium: '中', high: '高' };
 
@@ -183,6 +228,7 @@ export default function TodoApp() {
                                 id="modalEditTitle"
                                 value={editTitle}
                                 onChange={(e) => setEditTitle(e.target.value)}
+                                disabled={loading}
                                 required
                             />
                         </div>
@@ -211,8 +257,8 @@ export default function TodoApp() {
                             <button type="button" className="toggle-btn" onClick={() => setIsEditModalOpen(false)}>
                                 キャンセル
                             </button>
-                            <button type="submit" className="simple-login-btn" style={{marginTop: 0, marginBottom: 0}}> {/* simple-login-btnのスタイルを流用 */}
-                                更新
+                            <button type="submit" className="simple-login-btn" style={{marginTop: 0, marginBottom: 0}} disabled={loading}>
+                                {loading ? '更新中...' : '更新'}
                             </button>
                         </div>
                     </form>
@@ -241,8 +287,8 @@ export default function TodoApp() {
                             <option value="medium">中</option>
                             <option value="high">高</option>
                         </select>
-                        <button type="submit">
-                            <i className="fas fa-plus"></i> 追加
+                        <button type="submit" disabled={loading}>
+                            {loading ? <><i className="fas fa-spinner fa-spin"></i> 追加中...</> : <><i className="fas fa-plus"></i> 追加</>}
                         </button>
                     </div>
                     <textarea
@@ -260,12 +306,12 @@ export default function TodoApp() {
                 <div className="todo-list-header">
                     <h2><i className="fas fa-list"></i> TODOリスト</h2>
                     <div className="filter-controls">
-                        <select id="filterStatus" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+                        <select id="filterStatus" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} disabled={loading}>
                             <option value="all">全て</option>
                             <option value="pending">未完了</option>
                             <option value="completed">完了済み</option>
                         </select>
-                        <select id="filterPriority" value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)}>
+                        <select id="filterPriority" value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)} disabled={loading}>
                             <option value="all">全優先度</option>
                             <option value="high">高</option>
                             <option value="medium">中</option>

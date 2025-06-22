@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  experimental: {
+    serverComponentsExternalPackages: ['pg']
+  },
+  output: 'standalone'
 };
 
 module.exports = nextConfig;
