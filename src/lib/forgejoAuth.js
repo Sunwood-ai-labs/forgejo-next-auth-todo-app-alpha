@@ -77,7 +77,7 @@ class ForgejoAuth {
                 try {
                     const errorJson = JSON.parse(errorText);
                     errorMessage = errorJson.message || errorMessage;
-                } catch (e) {
+                } catch {
                     // errorTextがJSONでない場合はそのまま利用
                      if(errorText) errorMessage = `${errorMessage}: ${errorText}`;
                 }
@@ -135,7 +135,7 @@ class ForgejoAuth {
                  try {
                     const errorJson = JSON.parse(errorText);
                     errorMessage = errorJson.message || errorMessage;
-                } catch (e) {
+                } catch {
                      if(errorText) errorMessage = `${errorMessage}: ${errorText}`;
                 }
                 throw new Error(errorMessage);
@@ -330,7 +330,7 @@ class ForgejoAuth {
                  try {
                     const errorJson = JSON.parse(errorText);
                     errorMessage = errorJson.message || errorMessage;
-                } catch (e) {
+                } catch {
                      if(errorText) errorMessage = `${errorMessage}: ${errorText}`;
                 }
                 throw new Error(errorMessage);

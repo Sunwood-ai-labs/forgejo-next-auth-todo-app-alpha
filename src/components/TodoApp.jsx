@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Modal from './Modal'; // Modalコンポーネントをインポート
 
 const LOCAL_STORAGE_KEY = 'forgejo_next_todos';
 
@@ -14,74 +15,6 @@ const escapeHtml = (unsafe) => {
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
 };
-
-
-export default function TodoApp() {
-    const [todos, setTodos] = useState([]);
-    const [todoTitle, setTodoTitle] = useState('');
-    const [todoDescription, setTodoDescription] = useState('');
-    const [todoPriority, setTodoPriority] = useState('medium');
-
-    const [filterStatus, setFilterStatus] = useState('all');
-    const [filterPriority, setFilterPriority] = useState('all');
-
-    // Load todos from localStorage on initial render
-    useEffect(() => {
-        try {
-            const storedTodos = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (storedTodos) {
-                setTodos(JSON.parse(storedTodos));
-            }
-        } catch (error) {
-            console.error("Error loading todos from localStorage:", error);
-            setTodos([]); // Fallback to empty array on error
-        }
-    }, []);
-
-    // Save todos to localStorage whenever todos state changes
-    useEffect(() => {
-        try {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(todos));
-        } catch (error) {
-            console.error("Error saving todos to localStorage:", error);
-        }
-    }, [todos]);
-
-    const generateId = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
-
-    const handleAddTodo = (e) => {
-        e.preventDefault();
-        if (!todoTitle.trim()) {
-            alert('TODOのタイトルを入力してください'); // Replace with better notification
-            return;
-        }
-        const newTodo = {
-            id: generateId(),
-            title: todoTitle.trim(),
-            description: todoDescription.trim(),
-            priority: todoPriority,
-            completed: false,
-            createdAt: new Date().toISOString(),
-            completedAt: null,
-            updatedAt: new Date().toISOString(),
-        };
-        setTodos(prevTodos => [newTodo, ...prevTodos]);
-        setTodoTitle('');
-        setTodoDescription('');
-        setTodoPriority('medium');
-    };
-
-    const toggleTodoComplete = (id) => {
-        setTodos(prevTodos =>
-            prevTodos.map(todo =>
-                todo.id === id
-                    ? { ...todo, completed: !todo.completed, completedAt: !todo.completed ? new Date().toISOString() : null, updatedAt: new Date().toISOString() }
-                    : todo
-            )
-        );
-    };
-
-import Modal from './Modal'; // Modalコンポーネントをインポート
 
 export default function TodoApp() {
     const [todos, setTodos] = useState([]);
@@ -366,7 +299,7 @@ export default function TodoApp() {
                                     <button onClick={() => toggleTodoComplete(todo.id)} className="complete-btn" title={todo.completed ? '未完了に戻す' : '完了にする'}>
                                         <i className={`fas fa-${todo.completed ? 'undo' : 'check'}`}></i>
                                     </button>
-                                    <button onClick={() => editTodo(todo.id)} className="edit-btn" title="編集">
+                                    <button onClick={() => openEditModal(todo)} className="edit-btn" title="編集">
                                         <i className="fas fa-edit"></i>
                                     </button>
                                     <button onClick={() => deleteTodo(todo.id)} className="delete-btn" title="削除">

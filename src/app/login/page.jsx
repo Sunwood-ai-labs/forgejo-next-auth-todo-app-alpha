@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Head from 'next/head';
-import { useAuth } from '@/contexts/AuthContext';
-import LoadingSpinner from '@/components/LoadingSpinner'; // AuthProviderがローディングをハンドルするが念のため
+import { useAuth } from '../../contexts/AuthContext';
+import LoadingSpinner from '../../components/LoadingSpinner'; // AuthProviderがローディングをハンドルするが念のため
 
 export default function LoginPage() {
   const { login, isLoading: authLoading, isAuthenticated } = useAuth(); // isLoadingはAuthProviderの全体的なロード状態
