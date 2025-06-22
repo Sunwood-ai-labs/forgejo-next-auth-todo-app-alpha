@@ -3,9 +3,9 @@
 import React from 'react'; // useEffect, useState は不要になる
 import Head from 'next/head';
 // useRouter は AuthProvider が担当するので不要になる場合が多い
-import { useAuth } from '@/contexts/AuthContext';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import TodoApp from '@/components/TodoApp';
+import { useAuth } from '../../contexts/AuthContext';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import TodoApp from '../../components/TodoApp';
 
 export default function DashboardPage() {
   const { user, logout, isLoading, isAuthenticated } = useAuth();

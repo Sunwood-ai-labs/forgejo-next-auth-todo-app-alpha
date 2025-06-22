@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import forgejoAuthInstance from '@/lib/forgejoAuth'; // クライアントサイドのAuthインスタンス
-import LoadingSpinner from '@/components/LoadingSpinner';
+import forgejoAuthInstance from '../lib/forgejoAuth'; // クライアントサイドのAuthインスタンス
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const AuthContext = createContext(null);
 
