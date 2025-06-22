@@ -12,21 +12,36 @@ export class TodoService {
       );
 
       if (existingUser.rows.length > 0) {
-        // ユーザー情報を更新
-        const updatedUser = await query(
-          `UPDATE users 
-           SET username = $2, email = $3, full_name = $4, avatar_url = $5, updated_at = CURRENT_TIMESTAMP
-           WHERE forgejo_user_id = $1 
-           RETURNING *`,
-          [
-            forgejoUserData.id.toString(),
-            forgejoUserData.login,
-            forgejoUserData.email,
-            forgejoUserData.full_name || forgejoUserData.login,
-            forgejoUserData.avatar_url
-          ]
-        );
-        return updatedUser.rows[0];
+        const user = existingUser.rows[0];
+        const fullName = forgejoUserData.full_name || forgejoUserData.login;
+        
+        // ユーザー情報に変更があるかチェック
+        const needsUpdate =
+          user.username !== forgejoUserData.login ||
+          user.email !== forgejoUserData.email ||
+          user.full_name !== fullName ||
+          user.avatar_url !== forgejoUserData.avatar_url;
+        
+        if (needsUpdate) {
+          // 変更がある場合のみ更新
+          const updatedUser = await query(
+            `UPDATE users
+             SET username = $2, email = $3, full_name = $4, avatar_url = $5, updated_at = CURRENT_TIMESTAMP
+             WHERE forgejo_user_id = $1
+             RETURNING *`,
+            [
+              forgejoUserData.id.toString(),
+              forgejoUserData.login,
+              forgejoUserData.email,
+              fullName,
+              forgejoUserData.avatar_url
+            ]
+          );
+          return updatedUser.rows[0];
+        } else {
+          // 変更がない場合は既存ユーザーをそのまま返す
+          return user;
+        }
       } else {
         // 新規ユーザーを作成
         const newUser = await query(
