@@ -1,15 +1,30 @@
 /* リセットとベーススタイル */
+/* 涼雅カラーパレット */
+:root {
+    --primary: #025E73;
+    --secondary: #038C8C;
+    --accent: #04BFAD;
+    --neon-gold: #F2C166;
+    --bg-dark: #F2F2F2;
+    --bg-light: #FAFAFA;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Google Fonts: Kaisei Decol, M PLUS Rounded 1c を優先 */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Kaisei Decol', 'M PLUS Rounded 1c', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:
+        linear-gradient(135deg, var(--bg-light) 0%, var(--bg-dark) 50%, #E8F4F8 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M0,50 Q25,25 50,50 T100,50' stroke='%23038C8C' fill='none' opacity='0.08'/%3E%3Cpath d='M0,60 Q25,35 50,60 T100,60' stroke='%23038C8C' fill='none' opacity='0.06'/%3E%3Cpath d='M0,40 Q25,15 50,40 T100,40' stroke='%23038C8C' fill='none' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: cover, 200px 100px;
+    background-repeat: no-repeat, repeat;
     min-height: 100vh;
-    color: #333;
+    color: var(--primary);
 }
 
 /* ローディング画面 */
@@ -30,8 +45,8 @@ body {
 .spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid #e3e3e3;
-    border-top: 4px solid #667eea;
+    border: 4px solid var(--bg-dark);
+    border-top: 4px solid var(--accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 20px;
@@ -79,18 +94,18 @@ body {
 
 .login-header i {
     font-size: 3rem;
-    color: #667eea;
+    color: var(--accent);
     margin-bottom: 15px;
 }
 
 .login-header h1 {
-    color: #333;
+    color: var(--primary);
     margin-bottom: 10px;
     font-size: 1.8rem;
 }
 
 .login-header p {
-    color: #666;
+    color: var(--secondary);
     font-size: 0.95rem;
 }
 
@@ -102,13 +117,13 @@ body {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #333;
+    color: var(--primary);
 }
 
 .form-group input {
     width: 100%;
     padding: 12px 15px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--bg-dark);
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
@@ -116,20 +131,20 @@ body {
 
 .form-group input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(4, 191, 173, 0.1);
 }
 
 .form-group small {
     display: block;
     margin-top: 5px;
-    color: #666;
+    color: var(--secondary);
     font-size: 0.85rem;
 }
 
 .form-group small i {
     margin-right: 5px;
-    color: #667eea;
+    color: var(--accent);
 }
 
 .login-btn, .simple-login-btn {
@@ -148,24 +163,26 @@ body {
 }
 
 .simple-login-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
     color: white;
     margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(4, 191, 173, 0.3);
 }
 
 .simple-login-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 10px 20px rgba(4, 191, 173, 0.4);
 }
 
 .login-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: white;
+    box-shadow: 0 4px 12px rgba(2, 94, 115, 0.15);
 }
 
 .login-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 20px rgba(2, 94, 115, 0.2);
 }
 
 .login-btn:active, .simple-login-btn:active {
@@ -184,7 +201,7 @@ body {
 }
 
 .simple-login-section h3, .api-login-section h3 {
-    color: #334155;
+    color: var(--primary);
     margin-bottom: 20px;
     font-size: 1.2rem;
     display: flex;
@@ -193,23 +210,23 @@ body {
 }
 
 .simple-login-section h3 i {
-    color: #10b981;
+    color: var(--accent);
 }
 
 .api-login-section h3 i {
-    color: #667eea;
+    color: var(--secondary);
 }
 
 .api-guide {
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
+    background: var(--bg-light);
+    border: 2px solid var(--bg-dark);
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 25px;
 }
 
 .api-guide h3 {
-    color: #334155;
+    color: var(--primary);
     margin-bottom: 15px;
     font-size: 1.1rem;
     display: flex;
@@ -218,7 +235,7 @@ body {
 }
 
 .api-guide h3 i {
-    color: #667eea;
+    color: var(--secondary);
 }
 
 .api-guide ol {
@@ -228,11 +245,11 @@ body {
 
 .api-guide li {
     margin-bottom: 8px;
-    color: #475569;
+    color: var(--secondary);
 }
 
 .api-guide a {
-    color: #667eea;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 600;
 }
@@ -242,8 +259,8 @@ body {
 }
 
 .api-guide code {
-    background: #e2e8f0;
-    color: #334155;
+    background: var(--bg-dark);
+    color: var(--primary);
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Monaco', 'Menlo', monospace;
@@ -251,7 +268,7 @@ body {
 }
 
 .api-guide strong {
-    color: #1e293b;
+    color: var(--primary);
     font-weight: 600;
 }
 
@@ -268,13 +285,13 @@ body {
     left: 0;
     right: 0;
     height: 1px;
-    background: #e1e5e9;
+    background: var(--bg-dark);
 }
 
 .divider span {
-    background: white;
+    background: var(--bg-light);
     padding: 0 15px;
-    color: #6b7280;
+    color: var(--secondary);
     font-size: 0.9rem;
 }
 
@@ -285,8 +302,8 @@ body {
 
 .toggle-btn {
     background: none;
-    border: 1px solid #e1e5e9;
-    color: #6b7280;
+    border: 1px solid var(--bg-dark);
+    color: var(--secondary);
     padding: 8px 16px;
     border-radius: 6px;
     font-size: 0.9rem;
@@ -298,24 +315,24 @@ body {
 }
 
 .toggle-btn:hover {
-    border-color: #667eea;
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(4, 191, 173, 0.05);
 }
 
 .error-message {
-    background: #fee;
-    color: #c53030;
+    background: #FDEEDC;
+    color: #B85C38;
     padding: 12px;
     border-radius: 8px;
     margin-top: 15px;
-    border-left: 4px solid #c53030;
+    border-left: 4px solid #B85C38;
 }
 
 /* ダッシュボード */
 .dashboard {
     min-height: 100vh;
-    background: #f8fafc;
+    background: var(--bg-light);
 }
 
 .dashboard-header {
@@ -336,12 +353,12 @@ body {
 }
 
 .header-content h1 {
-    color: #333;
+    color: var(--primary);
     font-size: 1.8rem;
 }
 
 .header-content h1 i {
-    color: #667eea;
+    color: var(--accent);
     margin-right: 10px;
 }
 
@@ -355,22 +372,23 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 2px solid #667eea;
+    border: 2px solid var(--accent);
 }
 
 .logout-btn {
     padding: 8px 16px;
-    background: #ef4444;
+    background: var(--accent);
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
     transition: background-color 0.3s ease;
+    box-shadow: 0 2px 8px rgba(4,191,173,0.15);
 }
 
 .logout-btn:hover {
-    background: #dc2626;
+    background: var(--primary);
 }
 
 /* メインコンテンツ */
@@ -384,7 +402,7 @@ body {
 
 /* TODOフォーム */
 .todo-form-container {
-    background: white;
+    background: var(--bg-light);
     border-radius: 12px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -392,11 +410,11 @@ body {
 
 .todo-form-container h2 {
     margin-bottom: 20px;
-    color: #333;
+    color: var(--primary);
 }
 
 .todo-form-container h2 i {
-    color: #10b981;
+    color: var(--accent);
     margin-right: 10px;
 }
 
@@ -409,19 +427,19 @@ body {
 
 .todo-form input[type="text"] {
     padding: 12px 15px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--bg-dark);
     border-radius: 8px;
     font-size: 1rem;
 }
 
 .todo-form input[type="text"]:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--accent);
 }
 
 .todo-form select {
     padding: 12px 15px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--bg-dark);
     border-radius: 8px;
     font-size: 1rem;
     background: white;
@@ -430,23 +448,25 @@ body {
 
 .todo-form button {
     padding: 12px 20px;
-    background: #10b981;
+    background: var(--accent);
     color: white;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s;
+    box-shadow: 0 2px 8px rgba(4,191,173,0.15);
 }
 
 .todo-form button:hover {
-    background: #059669;
+    background: var(--secondary);
+    box-shadow: 0 4px 16px rgba(4,191,173,0.25);
 }
 
 .todo-form textarea {
     width: 100%;
     padding: 12px 15px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--bg-dark);
     border-radius: 8px;
     font-size: 1rem;
     resize: vertical;
@@ -455,12 +475,12 @@ body {
 
 .todo-form textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--accent);
 }
 
 /* TODOリスト */
 .todo-list-container {
-    background: white;
+    background: var(--bg-light);
     border-radius: 12px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -476,11 +496,11 @@ body {
 }
 
 .todo-list-header h2 {
-    color: #333;
+    color: var(--primary);
 }
 
 .todo-list-header h2 i {
-    color: #667eea;
+    color: var(--accent);
     margin-right: 10px;
 }
 
@@ -770,12 +790,15 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    border-bottom: 1px solid #e1e5e9;
+    border-bottom: 1px solid var(--bg-dark);
+    background: linear-gradient(135deg, var(--bg-light) 60%, var(--bg-dark) 100%);
+    border-radius: 16px 16px 0 0;
 }
 
 .modal-header h3 {
-    color: #333;
+    color: var(--primary);
     margin: 0;
+    font-family: 'Kaisei Decol', serif;
 }
 
 .modal-close {
@@ -783,14 +806,14 @@ body {
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--secondary);
     padding: 5px;
     border-radius: 4px;
     transition: background-color 0.3s ease;
 }
 
 .modal-close:hover {
-    background: #f3f4f6;
+    background: var(--bg-dark);
 }
 
 .modal-body {
@@ -896,16 +919,18 @@ body {
     z-index: 10000;
     animation: slideInRight 0.3s ease-out;
     max-width: 300px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(4,191,173,0.18);
+    font-family: 'M PLUS Rounded 1c', 'Kaisei Decol', sans-serif;
 }
 .toast-success {
-    background: #10b981;
+    background: linear-gradient(135deg, var(--accent) 60%, var(--secondary) 100%);
 }
 .toast-error {
-    background: #ef4444;
+    background: linear-gradient(135deg, #FDEEDC 60%, #B85C38 100%);
+    color: #7a5c00;
 }
 .toast-info {
-    background: #3b82f6;
+    background: linear-gradient(135deg, var(--primary) 60%, var(--secondary) 100%);
 }
 
 @keyframes slideInRight {
@@ -941,4 +966,229 @@ body {
     .todo-form-container .form-row {
         grid-template-columns: 1fr; /* Ensure this overrides the desktop version */
     }
+}
+
+/* --- 涼雅テーマ: アイコン＆ボタンカラーマップ --- */
+.fas, .fab, .far, .fa-solid, .fa-regular, .fa-brands {
+  color: var(--primary);
+  transition: color 0.2s;
+}
+.badge i,
+.todo-list-header h2 i,
+.todo-form-container h2 i,
+.stats-container h2 i,
+.feature-icon,
+.stat-icon {
+  color: var(--accent);
+}
+.todo-actions .complete-btn i {
+  color: var(--bg-light);
+}
+.todo-actions .edit-btn i {
+  color: var(--secondary);
+}
+.todo-actions .delete-btn i {
+  color: var(--neon-gold);
+}
+.todo-item.completed .todo-actions .complete-btn i {
+  color: var(--secondary);
+}
+.stat-card .stat-icon {
+  color: var(--bg-light);
+}
+.stat-card:nth-child(2) .stat-icon,
+.stat-card .fa-percentage {
+  color: var(--neon-gold);
+}
+.stat-card:nth-child(3) .stat-icon {
+  color: var(--accent);
+}
+.stat-card:nth-child(4) .stat-icon {
+  color: var(--secondary);
+}
+.feature-item .feature-icon {
+  color: var(--primary);
+}
+.feature-item:hover .feature-icon {
+  color: var(--accent);
+}
+.badge {
+  background: linear-gradient(135deg, var(--accent), var(--secondary));
+  color: white;
+}
+.badge i {
+  color: var(--neon-gold);
+}
+.todo-list-header h2 i,
+.todo-form-container h2 i {
+  color: var(--accent);
+}
+.stats-container h2 i {
+  color: var(--neon-gold);
+}
+
+/* --- 涼雅テーマ: ボタン・バッジ・アイコン背景カラーマップ --- */
+.complete-btn {
+  background: linear-gradient(135deg, var(--accent) 60%, var(--secondary) 100%);
+  color: var(--bg-light);
+}
+.complete-btn:hover {
+  background: linear-gradient(135deg, var(--secondary) 60%, var(--accent) 100%);
+}
+.edit-btn {
+  background: linear-gradient(135deg, var(--secondary) 60%, var(--primary) 100%);
+  color: var(--bg-light);
+}
+.edit-btn:hover {
+  background: linear-gradient(135deg, var(--primary) 60%, var(--secondary) 100%);
+}
+.delete-btn {
+  background: linear-gradient(135deg, var(--neon-gold) 60%, #B85C38 100%);
+  color: #7a5c00;
+}
+.delete-btn:hover {
+  background: linear-gradient(135deg, #B85C38 60%, var(--neon-gold) 100%);
+  color: #fffbe6;
+}
+.badge {
+  background: linear-gradient(135deg, var(--accent), var(--secondary));
+  color: white;
+  box-shadow: 0 4px 12px rgba(4, 191, 173, 0.3);
+}
+.badge i {
+  color: var(--neon-gold);
+}
+.stat-card .stat-icon {
+  background: linear-gradient(135deg, var(--primary) 60%, var(--accent) 100%);
+  color: var(--bg-light);
+}
+.stat-card:nth-child(2) .stat-icon {
+  background: linear-gradient(135deg, var(--neon-gold) 60%, #FFD700 100%);
+  color: #7a5c00;
+}
+.stat-card:nth-child(3) .stat-icon {
+  background: linear-gradient(135deg, var(--accent) 60%, var(--secondary) 100%);
+  color: var(--bg-light);
+}
+.stat-card:nth-child(4) .stat-icon {
+  background: linear-gradient(135deg, var(--secondary) 60%, var(--primary) 100%);
+  color: var(--bg-light);
+}
+.feature-item .feature-icon {
+  background: linear-gradient(135deg, var(--bg-light) 60%, var(--bg-dark) 100%);
+  color: var(--primary);
+  border-radius: 50%;
+  padding: 8px;
+  font-size: 2rem;
+  box-shadow: 0 2px 8px rgba(4,191,173,0.10);
+}
+.feature-item:hover .feature-icon {
+  background: linear-gradient(135deg, var(--accent) 60%, var(--secondary) 100%);
+  color: var(--bg-light);
+}
+
+/* --- 涼雅テーマ: アイコン色を白で統一 --- */
+.fas, .fab, .far, .fa-solid, .fa-regular, .fa-brands,
+.badge i,
+.todo-list-header h2 i,
+.todo-form-container h2 i,
+.stats-container h2 i,
+.feature-icon,
+.stat-icon,
+.todo-actions button i {
+  color: #fff !important;
+  transition: color 0.2s;
+}
+
+/* --- ダークテーマ用カラーパレット --- */
+[data-theme="dark"] {
+  /* 夜涼（やりょう）パレット */
+  --primary: #04BFAD;         /* Primary-Dark: 蛍の光 */
+  --secondary: #F2C166;       /* Secondary-Dark: 星の光 */
+  --accent: #038C8C;          /* Accent-Dark: 夜の海面 */
+  --neon-gold: #66D9EF;       /* Neon-Dark: 月光 */
+  --bg-dark: #0A1A1F;         /* BG-Dark-Dark: 深い夜の海 */
+  --bg-light: #1A2F35;        /* BG-Light-Dark: 夜霧 */
+}
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-dark) 100%);
+  color: var(--primary);
+}
+[data-theme="dark"] .dashboard,
+[data-theme="dark"] .todo-form-container,
+[data-theme="dark"] .todo-list-container,
+[data-theme="dark"] .stats-container,
+[data-theme="dark"] .login-card,
+[data-theme="dark"] .api-guide {
+  background: var(--bg-light);
+  color: var(--primary);
+  box-shadow: 0 4px 24px rgba(4,191,173,0.10);
+}
+[data-theme="dark"] .modal-content {
+  background: var(--bg-dark);
+  color: var(--primary);
+}
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group textarea,
+[data-theme="dark"] .form-group select {
+  background: var(--bg-dark);
+  color: var(--primary);
+  border-color: var(--accent);
+}
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group textarea:focus {
+  border-color: var(--neon-gold);
+  box-shadow: 0 0 0 3px rgba(242, 193, 102, 0.1);
+}
+[data-theme="dark"] .badge,
+[data-theme="dark"] .stat-card .stat-icon,
+[data-theme="dark"] .feature-item .feature-icon,
+[data-theme="dark"] .complete-btn,
+[data-theme="dark"] .edit-btn,
+[data-theme="dark"] .delete-btn {
+  filter: brightness(1.1) saturate(1.2);
+}
+[data-theme="dark"] .todo-item {
+  background: var(--bg-dark);
+  border-color: var(--accent);
+}
+[data-theme="dark"] .todo-item.completed {
+  background: #22383e;
+  border-color: var(--neon-gold);
+}
+[data-theme="dark"] .modal-header {
+  background: linear-gradient(135deg, var(--bg-dark) 60%, var(--bg-light) 100%);
+  border-bottom: 1px solid var(--accent);
+}
+[data-theme="dark"] .modal-close {
+  color: var(--neon-gold);
+}
+[data-theme="dark"] .modal-close:hover {
+  background: var(--accent);
+}
+[data-theme="dark"] .toast {
+  box-shadow: 0 4px 24px rgba(242,193,102,0.10);
+}
+
+/* --- テーマ切り替えトグルボタン --- */
+.theme-toggle-btn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 20000;
+  background: linear-gradient(135deg, var(--accent), var(--secondary));
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 22px;
+  font-size: 1.1rem;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(4,191,173,0.18);
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.theme-toggle-btn:hover {
+  background: linear-gradient(135deg, var(--secondary), var(--accent));
+  box-shadow: 0 4px 16px rgba(4,191,173,0.25);
 }
